@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "fastapi-rest-framework"
+version = "0.0.1"
+description = ""
+authors = ["tc-imba <liuyh970615@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+fastapi = "^0.68.1"
+loguru = "^0.5.3"
+pydantic = {extras = ["dotenv"], version = "^1.8.2"}
+sqlmodel = "^0.0.4"
+click = "^7.1.2"
+click-option-group = "^0.5.3"
+
+[tool.poetry.dev-dependencies]
+pre-commit = "^2.14.0"
+pytest = "^6.2.4"
+fastapi = {extras = ["all"], version = "^0.68.1"}
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.mypy]
+plugins = "pydantic.mypy"
+
+follow_imports = "silent"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+
+# for strict mypy: (this is the tricky one :-))
+disallow_untyped_defs = true
