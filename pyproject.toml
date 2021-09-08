@@ -14,11 +14,13 @@ pydantic = {extras = ["dotenv"], version = "^1.8.2"}
 sqlmodel = "^0.0.4"
 click = "^7.1.2"
 click-option-group = "^0.5.3"
+makefun = "^1.11.3"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.14.0"
 pytest = "^6.2.4"
 fastapi = {extras = ["all"], version = "^0.68.1"}
+python-semantic-release = "^7.19.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -37,3 +39,16 @@ no_implicit_reexport = true
 
 # for strict mypy: (this is the tricky one :-))
 disallow_untyped_defs = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+[tool.semantic_release]
+version_variable = ["fastapi_rest_framework/__init__.py:__version__", "pyproject.toml:version"]
+branch = "master"
+upload_to_pypi = false
+upload_to_release = false
+build_command = "pip install poetry && poetry build"
