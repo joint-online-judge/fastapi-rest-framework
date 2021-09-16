@@ -101,3 +101,8 @@ def init_logging() -> None:
     logger.configure(
         handlers=[{"sink": sys.stdout, "level": logging.DEBUG, "format": format_record}]
     )
+
+
+def intercept_all_loggers(level: int = logging.DEBUG) -> None:
+    logging.basicConfig(handlers=[InterceptHandler()], level=level)
+    logging.getLogger("uvicorn").handlers = []
