@@ -114,6 +114,7 @@ def command_end() -> Any:
                 fields.update(settings_class.__fields__.keys())
 
             new_kwargs = {}
+            cli_settings["__not_empty"] = True
             for key, value in kwargs.items():
                 if key in fields:
                     if value is not None:

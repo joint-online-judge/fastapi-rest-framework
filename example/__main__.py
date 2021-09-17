@@ -1,6 +1,6 @@
 import uvicorn
-from config import FastAPIConfig
 
+from example.config import FastAPIConfig
 from fastapi_rest_framework import cli, config
 
 
@@ -11,6 +11,7 @@ def main() -> None:
         "example.app:app",
         host=settings.host,
         port=settings.port,
+        debug=settings.debug,
         reload=settings.debug,
         reload_dirs=["example", "fastapi_rest_framework"],
     )

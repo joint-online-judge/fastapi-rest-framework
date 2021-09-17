@@ -15,6 +15,7 @@ sqlmodel = "^0.0.4"
 click = "^7.1.2"
 click-option-group = "^0.5.3"
 makefun = "^1.11.3"
+psutil = "^5.8.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.14.0"

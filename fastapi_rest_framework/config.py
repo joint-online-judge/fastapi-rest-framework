@@ -1,5 +1,11 @@
+import json
+import os
+import tempfile
+from pathlib import Path
 from typing import Any, Dict, Generic, Iterable, List, Optional, Type, TypeVar, Union
 
+from loguru import logger
+from psutil import pid_exists
 from pydantic import BaseModel, BaseSettings, root_validator
 
 T = TypeVar("T", bound=BaseSettings)
@@ -52,13 +58,52 @@ class EnvFileMixin(BaseSettings):
         env_file_encoding = "utf-8"
 
 
-class CLIMixin:
+class CLIMixin(BaseModel):
+    _temp_settings_file: Optional[str] = None
+
+    @staticmethod
+    def _save_cli_settings_to_temp_file(cli_settings: Dict[str, Any]) -> None:
+        if len(cli_settings) == 0:
+            return
+        tempdir = Path(tempfile.gettempdir()) / ".fastapi_rest_framework"
+        tempdir.mkdir(exist_ok=True)
+        # delete previous config files if the process doesn't exist
+        for file in tempdir.glob("*.cli.json"):
+            try:
+                pid = int(file.name.split(".")[0])
+                if not pid_exists(pid):
+                    file.unlink(missing_ok=True)
+            except:  # noqa
+                pass
+        file_path = tempdir / f"{os.getpid()}.cli.json"
+        with open(file_path, "w") as fp:
+            json.dump(cli_settings, fp)
+        logger.info("Save command line options into {}.", file_path)
+
+    @staticmethod
+    def _load_cli_settings_from_temp_file() -> Dict[str, Any]:
+        tempdir = Path(tempfile.gettempdir()) / ".fastapi_rest_framework"
+        file_path = tempdir / f"{os.getppid()}.cli.json"
+        try:
+            with open(file_path) as fp:
+                data = json.load(fp)
+            logger.info("Load command line options from {}.", file_path)
+            return data
+        except:  # noqa
+            return {}
+
     @root_validator(allow_reuse=True)
     def _inject_cli(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         from fastapi_rest_framework.cli import cli_settings
 
-        for key, value in cli_settings.items():
-            if key in values and value is not None:
+        if "__not_empty" in cli_settings:
+            del cli_settings["__not_empty"]
+            _cli_settings = cli_settings
+            CLIMixin._save_cli_settings_to_temp_file(cli_settings)
+        else:
+            _cli_settings = CLIMixin._load_cli_settings_from_temp_file()
+        for key, value in _cli_settings.items():
+            if key in values and not key.startswith("__") and value is not None:
                 values[key] = value
         return values
 
