@@ -65,7 +65,7 @@ class CLIMixin(BaseModel):
     def _save_cli_settings_to_temp_file(cli_settings: Dict[str, Any]) -> None:
         if len(cli_settings) == 0:
             return
-        tempdir = Path(tempfile.gettempdir()) / ".fastapi_rest_framework"
+        tempdir = Path(tempfile.gettempdir()) / "fastapi_rest_framework"
         tempdir.mkdir(exist_ok=True)
         # delete previous config files if the process doesn't exist
         for file in tempdir.glob("*.cli.json"):
@@ -82,7 +82,7 @@ class CLIMixin(BaseModel):
 
     @staticmethod
     def _load_cli_settings_from_temp_file() -> Dict[str, Any]:
-        tempdir = Path(tempfile.gettempdir()) / ".fastapi_rest_framework"
+        tempdir = Path(tempfile.gettempdir()) / "fastapi_rest_framework"
         file_path = tempdir / f"{os.getppid()}.cli.json"
         try:
             with open(file_path) as fp:
