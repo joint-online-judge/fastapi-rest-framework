@@ -1,3 +1,4 @@
+import abc
 import json
 import os
 import tempfile
@@ -7,8 +8,6 @@ from typing import Any, Dict, Generic, Iterable, List, Optional, Type, TypeVar, 
 from loguru import logger
 from psutil import pid_exists
 from pydantic import BaseModel, BaseSettings, root_validator
-
-T = TypeVar("T", bound=BaseSettings)
 
 _global_settings_models_dict: Dict[str, Type[BaseModel]] = {}
 _global_settings_models_names: List[str] = []
@@ -50,6 +49,13 @@ def parse_settings_models(
             raise KeyError(f"Error: settings {model_name} not added!")
         result.append(_global_settings_models_dict[model_name])
     return result
+
+
+class Base(BaseModel, abc.ABC):
+    pass
+
+
+T = TypeVar("T", bound=Base)
 
 
 class EnvFileMixin(BaseSettings):
