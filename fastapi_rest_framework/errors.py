@@ -1,8 +1,8 @@
 from contextvars import ContextVar
 from enum import Enum
-from typing import Type
+from typing import TYPE_CHECKING, Type, Union
 
-from fastapi import status
+from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
@@ -30,12 +30,15 @@ _error_code_model: ContextVar[Enum] = ContextVar(
 )
 
 
-def register_error_code_model(cls: Type[ErrorCode]) -> Enum:
-    if issubclass(cls, ErrorCode):
-        enum_cls = _generate_enum(cls)
-        _error_code_model.set(enum_cls)
-        return enum_cls
-    raise TypeError(f"{cls} is not subclass of ErrorCode")
+# TODO: fix code completion
+def register_error_code_model(cls: Type[ErrorCode]) -> Type[ErrorCode]:
+    if not issubclass(cls, ErrorCode):
+        raise TypeError(f"{cls} is not subclass of ErrorCode")
+    if TYPE_CHECKING:
+        return cls
+    enum_cls = _generate_enum(cls)
+    _error_code_model.set(enum_cls)
+    return enum_cls
 
 
 def get_error_code_model() -> Enum:
@@ -43,7 +46,8 @@ def get_error_code_model() -> Enum:
 
 
 class BizError(Exception):
-    def __init__(self, error_code: ErrorCode, error_msg: str = ""):
+    # FIXME: schema & type
+    def __init__(self, error_code: Union[str, ErrorCode], error_msg: str = ""):
         self.error_code = str(error_code)
         self.error_msg = error_msg
 
@@ -51,7 +55,20 @@ class BizError(Exception):
 def business_exception_response(exc: BizError) -> JSONResponse:
     return JSONResponse(
         jsonable_encoder(
-            {"error_code": exc.error_code, "error_msg": exc.error_msg, "data": {}}
+            {
+                "success": False,
+                "errorCode": exc.error_code,
+                "errorMsg": exc.error_msg,
+                "data": {},
+            }
         ),
         status_code=status.HTTP_200_OK,
     )
+
+
+def register_business_exception_handler(app: FastAPI):
+    @app.exception_handler(BizError)
+    async def business_exception_handler(
+        request: Request, exc: BizError
+    ) -> JSONResponse:
+        return business_exception_response(exc)
