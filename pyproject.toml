@@ -35,5 +35,5 @@ upload_to_pypi = false
 upload_to_release = false
 build_command = "pip install poetry && poetry build"
 
-[tool.pycln]
-all = true
+# [tool.pycln]
+# all = true

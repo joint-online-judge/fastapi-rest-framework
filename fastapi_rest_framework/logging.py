@@ -96,6 +96,7 @@ def init_logging() -> None:
     # change handler for default uvicorn logger
     intercept_handler = InterceptHandler()
     logging.getLogger("uvicorn").handlers = [intercept_handler]
+    logging.getLogger("uvicorn.access").handlers = [intercept_handler]
 
     # set logs output, level and format
     logger.configure(
