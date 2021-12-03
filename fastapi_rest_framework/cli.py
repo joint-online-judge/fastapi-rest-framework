@@ -78,15 +78,20 @@ def add_options(options: List[Any]) -> Callable[..., Callable[..., Any]]:
 def command_start(
     settings_models: Union[None, str, Iterable[str]] = None,
     name: str = None,
+    group: Optional[click.Group] = None,
 ) -> Any:
     parsed_settings_models = parse_settings_models(settings_models)
     context_settings = dict(
         help_option_names=["-h", "--help"],
         max_content_width=88,
     )
+    if group is None:
+        command_decorator = click.command
+    else:
+        command_decorator = group.command
 
     def decorator(func: Any) -> Any:
-        @click.command(name=name, context_settings=context_settings)
+        @command_decorator(name=name, context_settings=context_settings)
         @add_options(get_global_options(parsed_settings_models))
         @wraps(func)
         def wrapped(*args: Any, **kwargs: Any) -> Any:
@@ -131,9 +136,10 @@ def command_end() -> Any:
 def command(
     settings_models: Union[None, str, Iterable[str]] = None,
     name: str = None,
+    group: Optional[click.Group] = None,
 ) -> Any:
     def decorator(func: Any) -> Any:
-        @command_start(settings_models=settings_models, name=name)
+        @command_start(settings_models=settings_models, name=name, group=group)
         @command_end()
         @wraps(func)
         def wrapped(*args: Any, **kwargs: Any) -> Any:
