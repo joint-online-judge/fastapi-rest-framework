@@ -1,39 +1,40 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+
+[tool]
+
 [tool.poetry]
-name = "fastapi-rest-framework"
-version = "0.0.1"
-description = ""
 authors = ["tc-imba <liuyh970615@gmail.com>"]
+description = ""
 license = "MIT"
+name = "fastapi-rest-framework"
 readme = "README.md"
+version = "0.0.1"
 
 [tool.poetry.dependencies]
-python = "^3.7"
-fastapi = "^0.68.1"
-loguru = "^0.5.3"
-pydantic = {extras = ["dotenv"], version = "^1.8.2"}
-sqlmodel = "^0.0.4"
 click = "^7.1.2"
 click-option-group = "^0.5.3"
+fastapi = {version = "^0.70.0", optional = true}
+loguru = "^0.5.3"
 makefun = "^1.11.3"
 psutil = "^5.8.0"
+pydantic = {extras = ["dotenv"], version = "^1.8.2"}
+python = "^3.7"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.14.0"
 pytest = "^6.2.4"
-fastapi = {extras = ["all"], version = "^0.68.1"}
 python-semantic-release = "^7.19.1"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
+[tool.poetry.extras]
+fastapi = [
+    "fastapi"
+]
 
 [tool.semantic_release]
-version_variable = ["fastapi_rest_framework/__init__.py:__version__", "pyproject.toml:version"]
 branch = "master"
+build_command = "pip install poetry && poetry build"
 upload_to_pypi = false
 upload_to_release = false
-build_command = "pip install poetry && poetry build"
-
-# [tool.pycln]
-# all = true
+version_variable = ["fastapi_rest_framework/__init__.py:__version__", "pyproject.toml:version"]
